@@ -1,2 +1,4 @@
 .idea/
 venv/
+dist/
+django_aws_s3_sync.egg-info/
