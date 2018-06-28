@@ -40,7 +40,7 @@ class Command(BaseCommand):
                             help='Shows the progress of the upload files')
         parser.add_argument('--bucket_name',
                             type=str,
-                            default=getattr(settings, 'AWS_STORAGE_BACKUPS_BUCKET_NAME', ''),
+                            default=getattr(settings, 'AWS_STORAGE_BACKUPS_BUCKET_NAME', None),
                             help='Specify Amazon S3 Bucket name. Default: AWS_STORAGE_BACKUPS_BUCKET_NAME in django'
                                  ' settings')
         parser.add_argument('--n_backups',
@@ -49,23 +49,23 @@ class Command(BaseCommand):
                             help='Number of Postgres backups to keep in S3. Default=2')
         parser.add_argument('--aws_key_id',
                             type=str,
-                            default=getattr(settings, 'AWS_ACCESS_KEY_ID', ''),
+                            default=getattr(settings, 'AWS_ACCESS_KEY_ID', None),
                             help='Amazon S3 username. Default: AWS_ACCESS_KEY_ID in django settings.')
         parser.add_argument('--aws_secret_key',
                             type=str,
-                            default=getattr(settings, 'AWS_SECRET_ACCESS_KEY', ''),
+                            default=getattr(settings, 'AWS_SECRET_ACCESS_KEY', None),
                             help='Amazon S3 password. Default: AWS_SECRET_ACCESS_KEY in django settings')
         parser.add_argument('--backup_dir',
                             type=str,
-                            default='./couch_management/',
+                            default=getattr(settings, 'AWS_LOCAL_BASE_DIRECTORY', None),
                             help='Directory to sync with Amazon.')
         parser.add_argument('--daily_backup_subdir',
                             type=str,
-                            default='backups/',
+                            default=getattr(settings, 'AWS_DAILY_BACKUP_SUBDIR', None),
                             help='Directory that contains the daily backups.')
         parser.add_argument('--weekly_backup_subdir',
                             type=str,
-                            default='weekly_backups/',
+                            default=getattr(settings, 'AWS_WEEKLY_BACKUP_SUBDIR', None),
                             help='Directory that contains the weekly backups.')
 
     def login(self):
@@ -151,10 +151,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.show_progress = options['progress']
         self.bucket_name = options['bucket_name']
+        if self.bucket_name is None:
+            self.stdout.write('No bucket name specified. Exiting.')
+            return
         self.number_backups_to_keep = options['n_backups']
         self.aws_key_id = options['aws_key_id']
+        if self.aws_key_id is None:
+            self.stdout.write('No aws key id specified. Exiting.')
+            return
         self.aws_secret_key = options['aws_secret_key']
+        if self.aws_secret_key is None:
+            self.stdout.write('No aws secret key specified. Exiting.')
+            return
         self.backup_directory = options['backup_dir']
+        if os.path.isdir(self.backup_directory) is False:
+            self.stdout.write('{} is not a valid directory. Exiting.'.format(self.backup_directory))
+            return
         self.DAILY = options['daily_backup_subdir']
         self.WEEKLY = options['weekly_backup_subdir']
 
@@ -169,10 +181,16 @@ class Command(BaseCommand):
             self.stdout.write('No bucket with that name, or no permission to access it! Exiting.')
             return
 
-        self.sync_files_with_s3(bucket)
+        if self.backup_directory:
+            self.sync_files_with_s3(bucket)
+        else:
+            self.stdout.write('Backup directory not set. Exiting.')
+            return
 
-        self.handle_old_files(bucket, self.DAILY)
-        self.handle_old_files(bucket, self.WEEKLY)
+        if self.DAILY:
+            self.handle_old_files(bucket, self.DAILY)
+        if self.WEEKLY:
+            self.handle_old_files(bucket, self.WEEKLY)
 
 
 # Callback used to keep progress of the uploads
