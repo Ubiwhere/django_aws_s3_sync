@@ -58,15 +58,17 @@ class Command(BaseCommand):
         parser.add_argument('--backup_dir',
                             type=str,
                             default=getattr(settings, 'AWS_LOCAL_BASE_DIRECTORY', None),
-                            help='Directory to sync with Amazon.')
+                            help='Directory to sync with Amazon. Default: AWS_LOCAL_BASE_DIRECTORY in django settings')
         parser.add_argument('--daily_backup_subdir',
                             type=str,
                             default=getattr(settings, 'AWS_DAILY_BACKUP_SUBDIR', None),
-                            help='Directory that contains the daily backups.')
+                            help='Directory that contains the daily backups. Default: AWS_DAILY_BACKUP_SUBDIR in '
+                                 'django settings')
         parser.add_argument('--weekly_backup_subdir',
                             type=str,
                             default=getattr(settings, 'AWS_WEEKLY_BACKUP_SUBDIR', None),
-                            help='Directory that contains the weekly backups.')
+                            help='Directory that contains the weekly backups. Default: AWS_WEEKLY_BACKUP_SUBDIR in '
+                                 'django settings')
 
     def login(self):
         try:
