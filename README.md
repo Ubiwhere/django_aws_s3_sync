@@ -1,6 +1,6 @@
 # Django AWS S3 Synchronization
 
-Django management command that synchronizes local files with a given S3 bucket
+Django management command that synchronizes local files with a given S3 bucket and performs backup rotation on S3 keeping only the most recent
 
 ## Features:
 
@@ -16,6 +16,19 @@ INSTALLED_APPS = {
     'django_aws_s3_sync',
 }
 ```
+
+Optionally you can also add the following to the settings.py, they will work as defaults:
+
+```python
+AWS_STORAGE_BACKUPS_BUCKET_NAME = 'test-bucket'
+AWS_NUMBER_BACKUPS_TO_KEEP = 4
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_LOCAL_BASE_DIRECTORY = '/some/dir/example/'
+AWS_DAILY_BACKUP_SUBDIR = 'daily'
+AWS_WEEKLY_BACKUP_SUBDIR = 'weekly'
+```
+Note: the daily/weekly directories should point to the location of the backups performed by dbbackup and mediabackup
 
 `python manage.py aws_s3_sync --help` will give you the following
 
@@ -65,4 +78,5 @@ optional arguments:
 - Add parameter for custom regex expressions for other file patterns
 - Currently it is checking the timestamp from the file name instead of the modified date
 - Add argument for healthcheck after a successful synchronization
+- Add exclude parameter for directories and files
 - Tests...
