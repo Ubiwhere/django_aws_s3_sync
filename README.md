@@ -64,4 +64,5 @@ optional arguments:
 - Customize extensions for the backups (psql, psql.bin, tar, tar.gz, etc)
 - Add parameter for custom regex expressions for other file patterns
 - Currently it is checking the timestamp from the file name instead of the modified date
+- Add argument for healthcheck after a successful synchronization
 - Tests...
