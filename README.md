@@ -1,5 +1,11 @@
 # Django AWS S3 Synchronization
 
+Django management command that synchronizes local files with a given S3 bucket
+
+## Features:
+
+Additionally to synchronizing the local directory with S3 this management command will also analyze the files in the backup directories (meant for postgres backups and media backups) and it will only keep the more recent ones, how many are kept is defined in  `AWS_NUMBER_BACKUPS_TO_KEEP` in django settings and defaults to 2 if not present.  
+
 ## Usage:
 
 After installing (eg. `pip install git+https://github.com/Ubiwhere/django_aws_s3_sync.git`) just add `django_aws_s3_sync` to the installed apps:
@@ -34,7 +40,8 @@ optional arguments:
                         Specify Amazon S3 Bucket name. Default:
                         AWS_STORAGE_BACKUPS_BUCKET_NAME in django settings
   --n_backups N_BACKUPS
-                        Number of Postgres backups to keep in S3. Default=2
+                        Number of Postgres backups to keep in S3. Default=2 or
+                        AWS_NUMBER_BACKUPS_TO_KEEP defined in django settings
   --aws_key_id AWS_KEY_ID
                         Amazon S3 username. Default: AWS_ACCESS_KEY_ID in
                         django settings.
@@ -55,3 +62,4 @@ optional arguments:
 ## Todo:
 
 - Customize extensions for the backups (psql, psql.bin, tar, tar.gz, etc)
+- Tests...

@@ -46,7 +46,8 @@ class Command(BaseCommand):
         parser.add_argument('--n_backups',
                             type=int,
                             default=getattr(settings, 'AWS_NUMBER_BACKUPS_TO_KEEP', 4),
-                            help='Number of Postgres backups to keep in S3. Default=2')
+                            help='Number of Postgres backups to keep in S3. Default=2 or AWS_NUMBER_BACKUPS_TO_KEEP '
+                                 'defined in django settings')
         parser.add_argument('--aws_key_id',
                             type=str,
                             default=getattr(settings, 'AWS_ACCESS_KEY_ID', None),
